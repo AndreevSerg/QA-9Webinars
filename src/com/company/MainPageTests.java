@@ -7,30 +7,44 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class MainPageTests extends TestBase{
-    @Test
-    public void changeLanguage(){
-        Select langDropDown = new Select(driver.findElement(By.name("language")));
-        langDropDown.selectByIndex(2);
-        langDropDown.selectByVisibleText("suomi");
-        //langDropDown.deselectByVisibleText("suomi");
-        langDropDown.selectByValue("ru");
 
-        System.out.println(langDropDown.getAllSelectedOptions().get(0));
-        WebElement submitLangButton = driver.findElement(By.cssSelector("[data-loading-text=\"Submitting...\"]"));
-        submitLangButton.click();
+    @Test(priority = 2)
+    public void changeLanguageTest(){
+        selectLanguage("ru");
+        clickOnGoButton();
+        String text = getViewBasketButtonText();
+        Assert.assertEquals(text, "Посмотреть корзину", "Text not valid");
+    }
+
+    @Test(priority = 1)
+    public void changeLanguageTest2(){
+        selectLanguage("ru");
+        clickOnGoButton();
+        WebElement goButton = driver.findElement(By.cssSelector("button.btn.btn-default[type=\"submit\"]"));
+        waitUntilAllElementContainsText("Выполнить", goButton, 20);
+        String text = getViewBasketButtonText();
+        Assert.assertEquals(text, "Посмотреть корзину", "Text not valid");
+    }
+
+    private String getViewBasketButtonText() {
         WebElement basketButton = driver.findElement(By.className("btn-group"));
         String text = basketButton.getText();
-        Assert.assertEquals(text, "Посмотреть корзину", "Text not valid");
-
-
-
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-
+        return text;
     }
+
+    private void clickOnGoButton() {
+        WebElement submitLangButton = driver.findElement(By.cssSelector("button.btn.btn-default[type=\"submit\"]"));
+        submitLangButton.click();
+    }
+
+    private Select selectLanguage(String lang) {
+        Select langDropDown = new Select(driver.findElement(By.name("language")));
+       // langDropDown.selectByIndex(2);
+        //langDropDown.selectByVisibleText(lang);
+        //langDropDown.deselectByVisibleText("suomi");
+        langDropDown.selectByValue(lang);
+        System.out.println(langDropDown.getAllSelectedOptions().get(0));
+        return langDropDown;
+    }
+
 }
